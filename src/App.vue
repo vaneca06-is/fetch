@@ -1,26 +1,38 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div>
+    <h1>USUARIOS</h1>
+    <UserTable :userTable="users" @show-details="openModal"></UserTable>
+    <UserModal v-if="showModal" :prop_userSelected="selectedUser" @modalFalse="setModalFalse"> </UserModal>
+  </div>
 </template>
 
-<script>
-import HelloWorld from './components/HelloWorld.vue'
+<script setup>
+import { ref, onMounted } from 'vue';
+import UserTable from "./components/UserTable.vue"
+import UserModal from './components/UserModal.vue';
 
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
+const users = ref([]); //se inicializa con un arreglo vacio
+const selectedUser = ref({});
+const showModal = ref(false)
+
+onMounted(async () => {
+  try {
+    const res = await fetch("https://jsonplaceholder.typicode.com/users");
+
+    users.value = await res.json();
+    console.log('users', users.value)
+  } catch (error) {
+    console.error("Ha ocurrido un error al cargar los datos", error);
   }
+})
+
+const openModal = (user) => {
+  console.log(user);
+  selectedUser.value = user
+  showModal.value = true
+};
+
+const setModalFalse = () => {
+  showModal.value = false
 }
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
